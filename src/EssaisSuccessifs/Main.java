@@ -5,23 +5,29 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
+	
+	private final static double OBJECTIF = 1.9;
+	
 	public static void main(String[] args) {
 		
 		//pieces utilisables
 		List<Piece> piecesUtilisables = new ArrayList<Piece>();
-		Piece p10c = new Piece(0.1);
-		Piece p20c = new Piece(0.2);
-		Piece p50c = new Piece(0.5);
-		Piece p1e = new Piece(1);
-		Piece p2e = new Piece(2);
 		
-		//piecesUtilisables.add(0, p10c);
-		//piecesUtilisables.add(0, p20c);
-		//piecesUtilisables.add(0, p50c);
-		piecesUtilisables.add(0, p1e);
-		piecesUtilisables.add(0, p2e);
+		piecesUtilisables.add(new Piece(0.1));
+		piecesUtilisables.add(new Piece(0.2));
+		piecesUtilisables.add(new Piece(0.5));
+		piecesUtilisables.add(new Piece(1));
+		piecesUtilisables.add(new Piece(2));
 		
-		//essais successifs
+		// Autre jeu de pieces
+		List<Piece> autresPiecesUtilisables = new ArrayList<Piece>();
+		
+		autresPiecesUtilisables.add(new Piece(6));
+		autresPiecesUtilisables.add(new Piece(4));
+		autresPiecesUtilisables.add(new Piece(1));
+		
+		
+		/*//essais successifs
 		List<Piece> solution = new LinkedList<Piece>();
 		//solution=solutionEssaisSuccessifs(10,piecesUtilisables);
 		//System.out.println(solution);
@@ -32,8 +38,61 @@ public class Main {
 		System.out.println();
 		for(ArrayList<Piece> s2 : s) {
 			System.out.println(s2);
-		}
+		}*/
+		
+		/*** ALGORITHME GLOUTON ***/
+		//Il faut prouver ou infirmer qu’un algorithme glouton est exact pour chaque probleme traite.
+			// => Si non exact, contre exemple,
+			// => Sinon Etablir par recurrence que la solution en construction est constamment optimale
+			// => Ou partir de la solution gloutonne puis montrer que la transformation par echange de deux choix ne peut l'ameliorer
+		
+		// Principe pour les pieces de monnaie : 
+		
+		List<Piece> algoGlouton = combinaisonGlouton(piecesUtilisables, OBJECTIF);
+		System.out.println("Objectif : "+OBJECTIF+" :\n"+combinaisonGlouton(piecesUtilisables, OBJECTIF));
+		
+		System.out.println("Objectif : "+8.0+" :\n"+combinaisonGlouton(autresPiecesUtilisables, 8.0));
+		
+		System.out.println("Objectif : "+29.0+" :\n"+combinaisonGlouton(autresPiecesUtilisables, 29.0));
+		/*** FIN ALGORITHME GLOUTON ***/
+		
 	}
+	
+	/*** ALGORITHME GLOUTON ***/
+	private static List<Piece> combinaisonGlouton(List<Piece> pieces, double objectif){
+		boolean impossible = false;
+		List<Piece> solution = new ArrayList<Piece>();
+		
+		while(objectif>0 && !impossible) {
+			//System.out.println(objectif);
+			Piece toAdd = findMaxValue(pieces, objectif);
+			//System.out.println(toAdd.getValeur());
+			if(toAdd != null){
+				solution.add(toAdd);
+				objectif -= toAdd.getValeur();
+				objectif = Math.round(objectif*10.0)/10.0;
+				//System.out.println(objectif);
+			}
+			else {
+				impossible = true;
+			}
+		}
+		return solution;
+	}
+	
+	private static Piece findMaxValue(List<Piece> pieces, double objectif) {
+		double maxVal = 0; // Une valeur monetaire est forcement positive
+		Piece plusGrossePossible = null;
+		for(Piece piece : pieces) {
+			double checkVal = piece.getValeur();
+			if(maxVal<checkVal && checkVal<=objectif) {
+				plusGrossePossible = piece;
+				maxVal = checkVal;
+			}
+		}
+		return plusGrossePossible;
+	}
+	/*** FIN ALGORITHME GLOUTON ***/
 	
 	/*
 	 * v
