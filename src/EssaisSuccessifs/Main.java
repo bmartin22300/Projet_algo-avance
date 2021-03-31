@@ -6,18 +6,21 @@ import java.util.List;
 
 public class Main {
 	
-	private final static double OBJECTIF = 1.9;
+	
+	
+	
+private final static double OBJECTIF = 1.9;
 	
 	public static void main(String[] args) {
 		
 		//pieces utilisables
 		List<Piece> piecesUtilisables = new ArrayList<Piece>();
 		
-		piecesUtilisables.add(new Piece(0.1));
-		piecesUtilisables.add(new Piece(0.2));
-		piecesUtilisables.add(new Piece(0.5));
-		piecesUtilisables.add(new Piece(1));
 		piecesUtilisables.add(new Piece(2));
+		piecesUtilisables.add(new Piece(1));
+		piecesUtilisables.add(new Piece(0.5));
+		piecesUtilisables.add(new Piece(0.2));
+		piecesUtilisables.add(new Piece(0.1));
 		
 		// Autre jeu de pieces
 		List<Piece> autresPiecesUtilisables = new ArrayList<Piece>();
@@ -28,6 +31,8 @@ public class Main {
 		
 		
 		/*//essais successifs
+		 * 
+		 * System.out.println(solutionEssaisSuccessifs3(1.8,piecesUtilisables));
 		List<Piece> solution = new LinkedList<Piece>();
 		//solution=solutionEssaisSuccessifs(10,piecesUtilisables);
 		//System.out.println(solution);
@@ -94,6 +99,9 @@ public class Main {
 	}
 	/*** FIN ALGORITHME GLOUTON ***/
 	
+	
+	//satisfaisant, enregistrer, soltrouvee, defaire
+	
 	/*
 	 * v
 	var ent xi;
@@ -117,6 +125,136 @@ public class Main {
 	fin ;
 	 */
 	
+	//attention à garder les pieces utilisables dans l'ordre croissant
+	private static List<Piece> solutionEssaisSuccessifs3(double monnaieARendre, List<Piece> piecesUtilisables) {
+		List<Piece> x = new ArrayList<Piece>(); //la solution en cours
+		List<Piece> bestSolution = new ArrayList<Piece>(); //la meilleure solution
+		double somme=0.0;
+		
+		//Si=piecesUtilisables
+			
+		for(Piece xi : piecesUtilisables) { // pour chaque pièces de la solution
+			
+			//utilisation multiple de la meme piece
+			boolean keepPiece=true;
+			boolean satisfaisant = true;
+			while(keepPiece) {
+				
+				//calcul de satisfaisant : SUM(xi) < monnaie
+				//est-ce que nous ne rendons pas trop d'argent ?
+				somme+=xi.getValeur();
+				somme = Math.round(somme*10.0)/10.0; //approximation
+				if(somme>monnaieARendre) {
+					satisfaisant = false;
+				}
+				
+				if(satisfaisant) {
+					
+					//calcul de enregistrer 
+					x.add(xi);
+					
+					//calcul de soltrouve
+					if(somme==monnaieARendre) {//somme correspond 
+						keepPiece=false;
+						//calcul de meilleur
+						boolean nouvelleMeilleureSolution=false;
+						if(x.size()<bestSolution.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
+							nouvelleMeilleureSolution=true;
+						}
+						
+						if(nouvelleMeilleureSolution) {
+							bestSolution=x;
+						}
+						
+					}else {										
+						//si encorepossible alors //condition d'elagage ex : (p29)
+						if( (somme + xi.getValeur()) <= monnaieARendre) {
+							//on re essaie d'ajouter la meme piece --> creation d'une nouvelle liste 
+							keepPiece=true;
+						}else {
+							keepPiece=false;
+						}
+					}
+					//calcul de défaire 
+					//rien car on peut utiliser autant de fois une piece que l'on souhaite
+				}else {
+					somme-=xi.getValeur();
+					keepPiece=false;
+				}
+			}
+		}
+		
+		return x;
+		//return bestSolution;
+	}
+	
+	private static List<Piece> solutionEssaisSuccessifs2(int monnaieARendre, List<Piece> piecesUtilisables) {
+		List<Piece> x = new ArrayList<Piece>(); //la solution en cours
+		List<Piece> bestSolution = new ArrayList<Piece>(); //la meilleure solution
+		//List<ArrayList<Piece>> solutionsCandidates = calculerSi(piecesUtilisables);//ensemble des solutions candidates
+		List<ArrayList<Piece>> solutionsCandidates = null;//ensemble infini ?!
+		boolean satisfaisant = true;
+		int somme=0;
+		for(ArrayList<Piece> Si : solutionsCandidates) { //pour chaque solutions candidates
+			
+			for(Piece xi : Si) { // pour chaque pièces de la solution
+				
+				//calcul de satisfaisant : SUM(xi) < monnaie
+				//est-ce que nous ne rendons pas trop d'argent ?
+				somme+=xi.getValeur();
+				if(somme>monnaieARendre) {
+					satisfaisant = false;
+				}
+				
+				if(satisfaisant) {
+					//calcul de enregistrer 
+					x.add(xi);
+					
+					//calcul de soltrouve
+					if(somme==monnaieARendre) {//somme correspond 
+						
+						//calcul de meilleur
+						boolean nouvelleMeilleureSolution=false;
+						if(x.size()<bestSolution.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
+							nouvelleMeilleureSolution=true;
+						}
+						
+						if(nouvelleMeilleureSolution) {
+							bestSolution=x;
+						}
+						
+					}else {						
+						//calcul du max
+						double max=0;
+						for(Piece piece : Si) {
+							if(piece.getValeur()>max) {
+								max=piece.getValeur();
+							}
+						}
+						
+						//si encorepossible alors //condition d'elagage ex : (p29) la somme + le plus grand nombre de la solution candidate < monnaie à rendre
+						if( (somme + max) < monnaieARendre) {
+							//solopt(i + 1) 
+						}
+					}
+					
+					//calcul de défaire 
+					//...
+				}
+				
+			}
+			
+			//reset
+			somme=0;
+			x=new ArrayList<Piece>();
+		}
+	
+		return bestSolution;
+	}
+	
+	
+	
+	
 	private static List<Piece> solutionEssaisSuccessifs(int monnaieARendre, List<Piece> piecesUtilisables) {
 		List<Piece> solution = null; //la meilleure solution
 		int xi;
@@ -126,6 +264,7 @@ public class Main {
 		int somme=0;
 		for(ArrayList<Piece> Si : solutionsCandidates) {
 			
+			//calcul de satisfaisant : SUM(xi) < monnaie
 			//est-ce que nous ne rendons pas trop d'argent ?
 			for (Piece piece : Si) {
 				somme+=piece.getValeur();
@@ -135,7 +274,13 @@ public class Main {
 			}
 			
 			if(satisfaisant) {
-				if(somme==monnaieARendre) {//somme correspond //soltrouve()
+				//calcul de enregistrer
+				//...
+				
+				//calcul de soltrouve
+				if(somme==monnaieARendre) {//somme correspond 
+					
+					//calcul de meilleur
 					boolean nouvelleMeilleureSolution=false;
 					if(solution.size()<Si.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
 						nouvelleMeilleureSolution=true;
@@ -144,14 +289,15 @@ public class Main {
 						solution=Si;
 					}
 				}else {
-					//si encorepossible alors 
+					//si encorepossible alors //condition d'elagage ex : (p29) la somme + le plus grand nombre de la solution candidate < monnaie à rendre
 						//solopt(i + 1) 
 					//fsi
 				}
+				
+				//calcul de défaire 
+				//...
 			}
-			
 		}
-		
 	
 		return solution;
 	}
