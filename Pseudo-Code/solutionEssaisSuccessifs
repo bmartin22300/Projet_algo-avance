@@ -1,0 +1,42 @@
+variables de travail : 	vecteur des valeurs des pieces = piecesUtilisables 
+						vecteur de la solution actuelle = X
+						xi = valeur de la ième case de X
+						somcour = somme formée par la multiplication de X et de piecesUtilisables
+						monnaieARendre = input de la monnaie
+
+
+satisfait : 		somcour + (piecesUtilisables[i]*xi) <= monnaieARendre 
+
+enregistrer : 		somcour <-- somcour + piecesUtilisables[i]*xi 
+					X[i] <-- xi
+					nbPieces <-- nbPieces + xi;	
+
+soltrouvée : 		somcour = monnaieARendre
+
+encorepossible : 	i < n-1
+
+défaire : 			somcour <-- somcour - piecesUtilisables[i]*xi
+					nbPieces <-- nbPieces - xi
+					X[i] <-- 0
+
+
+procédure solutionEssaisSuccessifs(ent i)
+var ent xi;
+	début
+		calculer Si des valeurs possibles de xi; 				
+		pour xi parcourant Si 									
+		faire
+			si satisfaisant(xi) alors enregistrer (xi) ; 		
+				si soltrouvée alors								
+					si meilleure alors Y ← X ; 					
+						majvalopt 
+					fsi
+				sinon
+					si encorepossible alors 					
+						solopt(i + 1) 						
+					fsi
+				fsi ;
+				défaire(xi)										
+			fsi
+		fait
+	fin ;
