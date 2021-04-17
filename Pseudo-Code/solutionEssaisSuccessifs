@@ -1,15 +1,19 @@
 variables de travail : 	vecteur des valeurs des pieces = piecesUtilisables 
 						vecteur de la solution actuelle = X
 						xi = valeur de la ième case de X
-						somcour = somme formée par la multiplication de X et de piecesUtilisables
+						somcour = SUM( X[k] * piecesUtilisables[k] )
 						monnaieARendre = input de la monnaie
+						nbPieces = SUM( X[k] )
+						bestX = le meilleur X trouvée
+						bestNbPieces = SUM( bestX[k] ) 
+
 
 
 satisfait : 		somcour + (piecesUtilisables[i]*xi) <= monnaieARendre 
 
 enregistrer : 		somcour <-- somcour + piecesUtilisables[i]*xi 
 					X[i] <-- xi
-					nbPieces <-- nbPieces + xi;	
+					nbPieces <-- nbPieces + xi	
 
 soltrouvée : 		somcour = monnaieARendre
 
@@ -22,21 +26,26 @@ défaire : 			somcour <-- somcour - piecesUtilisables[i]*xi
 
 procédure solutionEssaisSuccessifs(ent i)
 var ent xi;
-	début
-		calculer Si des valeurs possibles de xi; 				
-		pour xi parcourant Si 									
+	début	
+		pour xi de 0 à +INFINI								
 		faire
-			si satisfaisant(xi) alors enregistrer (xi) ; 		
-				si soltrouvée alors								
-					si meilleure alors Y ← X ; 					
-						majvalopt 
+			si somcour + (piecesUtilisables[i]*xi) <= monnaieARendre alors 	
+				somcour <-- somcour + piecesUtilisables[i]*xi; 
+				X[i] <-- xi;
+				nbPieces <-- nbPieces + xi; 		
+				si somcour = monnaieARendre alors								
+					si nbPieces < bestNbPieces alors 
+						bestX <-- X;
+						bestNbPieces <-- nbPieces;	 		
 					fsi
 				sinon
-					si encorepossible alors 					
-						solopt(i + 1) 						
+					si i < n-1 alors 					
+						solutionEssaisSuccessifs(i + 1); 						
 					fsi
 				fsi ;
-				défaire(xi)										
+				somcour <-- somcour - piecesUtilisables[i]*xi
+				nbPieces <-- nbPieces - xi
+				X[i] <-- 0								
 			fsi
 		fait
 	fin ;

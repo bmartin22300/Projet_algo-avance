@@ -122,7 +122,7 @@ public class Main {
 					//sommme + le plus petit nombre restant a prendre doit etre <= monnaieARendre 
 					//tres utile si les valeurs de la liste piecesUtilisables sont dans l'ordre croissant
 					for(int j=i+1;j<n;j++) {
-						if((monnaieARendre-somcour)>piecesUtilisables.get(j) | egalDouble((monnaieARendre-somcour),piecesUtilisables.get(j))) { // >=
+						if((monnaieARendre-somcour)>=piecesUtilisables.get(j) | egalDouble((monnaieARendre-somcour),piecesUtilisables.get(j))) { // >=
 							condElagage2=true;
 						}
 					}
