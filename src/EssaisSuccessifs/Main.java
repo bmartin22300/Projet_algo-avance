@@ -1,19 +1,54 @@
 package EssaisSuccessifs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Main {
+	private final static double OBJECTIF = 1.9;
 	
+	//variables necessaires pour essais successifs///////////////////////////////////////////////////////////
+	static final double monnaieARendre=8.9;//possibilite de modifier
 	
+	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
+	static int n;//taille du vecteur
 	
+	static List<Integer> X = new ArrayList<Integer>();//vecteur du nb de pieces utilise pour chaque valeur de piece
+	static int nbPieces=0;//somme du vecteur X
+	static double somcour=0.0;//somme courantes des valeurs des pieces de X
 	
-private final static double OBJECTIF = 1.9;
+	static List<Integer> bestX = new ArrayList<Integer>();//le meilleur vecteur X (utilisant le moins de pieces)
+	static int bestNbPieces=(int) (monnaieARendre*10)+1;//on initialise au "pire cas" correspondant a (monnaieARendre*10) pieces de 0.1 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public static void main(String[] args) {
 		
-		//pieces utilisables
+		//essais successifs/////////////////////////////////////////////////
+		//initialiser les pieces utilisables
+		piecesUtilisables.add(1.0);
+		piecesUtilisables.add(0.2);
+		piecesUtilisables.add(0.1);
+		piecesUtilisables.add(2.0);
+		piecesUtilisables.add(0.5);
+		n=piecesUtilisables.size();
+
+		//initialisation des vecteurs X et bestX
+		X=initVecteur(X);
+		bestX=initVecteur(bestX);
+		
+		//appel a la fonction essais successifs
+		solutionEssaisSuccessifs(0);
+		
+		//affichage de la solution
+		System.out.println("Meilleure solution essais successifs pour rendre "+monnaieARendre+"€ :");
+		afficherSolutionEssaisSuccessifs(bestX);
+		System.out.println();
+		////////////////////////////////////////////////////////////////////
+		
 		List<Piece> piecesUtilisables = new ArrayList<Piece>();
 		
 		piecesUtilisables.add(new Piece(2));
@@ -28,22 +63,6 @@ private final static double OBJECTIF = 1.9;
 		autresPiecesUtilisables.add(new Piece(6));
 		autresPiecesUtilisables.add(new Piece(4));
 		autresPiecesUtilisables.add(new Piece(1));
-		
-		
-		/*//essais successifs
-		 * 
-		 * System.out.println(solutionEssaisSuccessifs3(1.8,piecesUtilisables));
-		List<Piece> solution = new LinkedList<Piece>();
-		//solution=solutionEssaisSuccessifs(10,piecesUtilisables);
-		//System.out.println(solution);
-		
-		List<ArrayList<Piece>> s = calculerSi(piecesUtilisables);
-		System.out.println();
-		System.out.println("---END---");
-		System.out.println();
-		for(ArrayList<Piece> s2 : s) {
-			System.out.println(s2);
-		}*/
 		
 		/*** ALGORITHME GLOUTON ***/
 		//Il faut prouver ou infirmer qu’un algorithme glouton est exact pour chaque probleme traite.
@@ -62,6 +81,97 @@ private final static double OBJECTIF = 1.9;
 		/*** FIN ALGORITHME GLOUTON ***/
 		
 	}
+	
+	//solutionEssaisSuccessifs///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	static void solutionEssaisSuccessifs(int i) {//i représente l'indice actuel du vecteur de X
+		
+		int maxXi=((int) (monnaieARendre/piecesUtilisables.get(i)))+2;//le nombre maximal de piece de cette valeur pour atteindre la monnaie
+		
+		for(int xi=0 ; xi<maxXi ; xi++) {//nb de pieces numéro i utilisees
+			
+			//satisfaisant ?
+			if( somcour+piecesUtilisables.get(i)*xi<monnaieARendre | egalDouble(somcour+piecesUtilisables.get(i)*xi,monnaieARendre) ) {//somcour restera inferieur ou egal a monnaieARendre
+				
+				//enregistrer
+				somcour+=piecesUtilisables.get(i)*xi;
+				X.set(i, xi);
+				nbPieces+=xi;	
+				
+				//solution trouvee ?
+				if(egalDouble(somcour,monnaieARendre)) {
+					
+					//meilleure ?
+					if(nbPieces<bestNbPieces) {
+						//mise a jour de la nouvelle meilleure solution
+						Collections.copy(bestX, X);
+						bestNbPieces=nbPieces;							
+					}
+					
+				}else {
+					
+					//elagage
+
+					//verifier que le nb de pieces peut etre ameliore
+					boolean condElagage=true;
+					if(nbPieces+1>=bestNbPieces) {
+						condElagage=false;
+					}
+					
+					boolean condElagage2=false;
+					//verifier si toute les valeurs de pieces restantes ne sont pas trop elevees
+					//sommme + le plus petit nombre restant a prendre doit etre <= monnaieARendre 
+					//tres utile si les valeurs de la liste piecesUtilisables sont dans l'ordre croissant
+					for(int j=i+1;j<n;j++) {
+						if((monnaieARendre-somcour)>piecesUtilisables.get(j) | egalDouble((monnaieARendre-somcour),piecesUtilisables.get(j))) { // >=
+							condElagage2=true;
+						}
+					}
+					
+					//encore possible ?
+					if(i<n-1 & condElagage & condElagage2 ) {
+						solutionEssaisSuccessifs(i+1);//prochaine valeur de piece
+					}
+					
+				}
+				
+				//defaire
+				somcour-=piecesUtilisables.get(i)*xi;
+				nbPieces-=xi;
+				X.set(i, 0);
+				
+			}
+		}
+	}
+		
+	//initialise la liste avec des valeurs egal a 0
+	private static List<Integer> initVecteur(List<Integer> X) {
+		X.clear();
+		X.add(0);
+		X.add(0);
+		X.add(0);
+		X.add(0);
+		X.add(0);
+		return X;
+	}
+
+	//affiche la solution sous la forme de vecteur
+	private static void afficherSolutionEssaisSuccessifs(List<Integer> bestX) {
+		for(int i=0; i<bestX.size() ; i++) {
+			System.out.println(piecesUtilisables.get(i)+"€ : "+bestX.get(i));
+		}
+	}
+
+	//comparaison de double
+	private static boolean egalDouble(double a, double b) {
+		double margeErreur=0.00001;
+		double difference = Math.abs(a-b);
+		if(difference<margeErreur) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	//fin essais successifs////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/*** ALGORITHME GLOUTON ***/
 	private static List<Piece> combinaisonGlouton(List<Piece> pieces, double objectif){
@@ -98,275 +208,5 @@ private final static double OBJECTIF = 1.9;
 		return plusGrossePossible;
 	}
 	/*** FIN ALGORITHME GLOUTON ***/
-	
-	
-	//satisfaisant, enregistrer, soltrouvee, defaire
-	
-	/*
-	 * v
-	var ent xi;
-	début
-		calculer Si;
-		pour xi parcourant Si 
-		faire
-			si satisfaisant(xi) alors enregistrer (xi) ;
-				si soltrouvée alors
-					si meilleure alors Y ← X ; 
-						majvalopt 
-					fsi
-				sinon
-					si encorepossible alors 
-						solopt(i + 1) 
-					fsi
-				fsi ;
-				défaire(xi)
-			fsi
-		fait
-	fin ;
-	 */
-	
-	//attention à garder les pieces utilisables dans l'ordre croissant
-	private static List<Piece> solutionEssaisSuccessifs3(double monnaieARendre, List<Piece> piecesUtilisables) {
-		List<Piece> x = new ArrayList<Piece>(); //la solution en cours
-		List<Piece> bestSolution = new ArrayList<Piece>(); //la meilleure solution
-		double somme=0.0;
-		
-		//Si=piecesUtilisables
-			
-		for(Piece xi : piecesUtilisables) { // pour chaque pièces de la solution
-			
-			//utilisation multiple de la meme piece
-			boolean keepPiece=true;
-			boolean satisfaisant = true;
-			while(keepPiece) {
-				
-				//calcul de satisfaisant : SUM(xi) < monnaie
-				//est-ce que nous ne rendons pas trop d'argent ?
-				somme+=xi.getValeur();
-				somme = Math.round(somme*10.0)/10.0; //approximation
-				if(somme>monnaieARendre) {
-					satisfaisant = false;
-				}
-				
-				if(satisfaisant) {
-					
-					//calcul de enregistrer 
-					x.add(xi);
-					
-					//calcul de soltrouve
-					if(somme==monnaieARendre) {//somme correspond 
-						keepPiece=false;
-						//calcul de meilleur
-						boolean nouvelleMeilleureSolution=false;
-						if(x.size()<bestSolution.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
-							nouvelleMeilleureSolution=true;
-						}
-						
-						if(nouvelleMeilleureSolution) {
-							bestSolution=x;
-						}
-						
-					}else {										
-						//si encorepossible alors //condition d'elagage ex : (p29)
-						if( (somme + xi.getValeur()) <= monnaieARendre) {
-							//on re essaie d'ajouter la meme piece --> creation d'une nouvelle liste 
-							keepPiece=true;
-						}else {
-							keepPiece=false;
-						}
-					}
-					//calcul de défaire 
-					//rien car on peut utiliser autant de fois une piece que l'on souhaite
-				}else {
-					somme-=xi.getValeur();
-					keepPiece=false;
-				}
-			}
-		}
-		
-		return x;
-		//return bestSolution;
-	}
-	
-	private static List<Piece> solutionEssaisSuccessifs2(int monnaieARendre, List<Piece> piecesUtilisables) {
-		List<Piece> x = new ArrayList<Piece>(); //la solution en cours
-		List<Piece> bestSolution = new ArrayList<Piece>(); //la meilleure solution
-		//List<ArrayList<Piece>> solutionsCandidates = calculerSi(piecesUtilisables);//ensemble des solutions candidates
-		List<ArrayList<Piece>> solutionsCandidates = null;//ensemble infini ?!
-		boolean satisfaisant = true;
-		int somme=0;
-		for(ArrayList<Piece> Si : solutionsCandidates) { //pour chaque solutions candidates
-			
-			for(Piece xi : Si) { // pour chaque pièces de la solution
-				
-				//calcul de satisfaisant : SUM(xi) < monnaie
-				//est-ce que nous ne rendons pas trop d'argent ?
-				somme+=xi.getValeur();
-				if(somme>monnaieARendre) {
-					satisfaisant = false;
-				}
-				
-				if(satisfaisant) {
-					//calcul de enregistrer 
-					x.add(xi);
-					
-					//calcul de soltrouve
-					if(somme==monnaieARendre) {//somme correspond 
-						
-						//calcul de meilleur
-						boolean nouvelleMeilleureSolution=false;
-						if(x.size()<bestSolution.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
-							nouvelleMeilleureSolution=true;
-						}
-						
-						if(nouvelleMeilleureSolution) {
-							bestSolution=x;
-						}
-						
-					}else {						
-						//calcul du max
-						double max=0;
-						for(Piece piece : Si) {
-							if(piece.getValeur()>max) {
-								max=piece.getValeur();
-							}
-						}
-						
-						//si encorepossible alors //condition d'elagage ex : (p29) la somme + le plus grand nombre de la solution candidate < monnaie à rendre
-						if( (somme + max) < monnaieARendre) {
-							//solopt(i + 1) 
-						}
-					}
-					
-					//calcul de défaire 
-					//...
-				}
-				
-			}
-			
-			//reset
-			somme=0;
-			x=new ArrayList<Piece>();
-		}
-	
-		return bestSolution;
-	}
-	
-	
-	
-	
-	private static List<Piece> solutionEssaisSuccessifs(int monnaieARendre, List<Piece> piecesUtilisables) {
-		List<Piece> solution = null; //la meilleure solution
-		int xi;
-		//List<ArrayList<Piece>> solutionsCandidates = calculerSi(piecesUtilisables);//ensemble des solutions candidates
-		List<ArrayList<Piece>> solutionsCandidates = null;//ensemble infini ?!
-		boolean satisfaisant = true;
-		int somme=0;
-		for(ArrayList<Piece> Si : solutionsCandidates) {
-			
-			//calcul de satisfaisant : SUM(xi) < monnaie
-			//est-ce que nous ne rendons pas trop d'argent ?
-			for (Piece piece : Si) {
-				somme+=piece.getValeur();
-				if(somme>monnaieARendre) {
-					satisfaisant = false;
-				}
-			}
-			
-			if(satisfaisant) {
-				//calcul de enregistrer
-				//...
-				
-				//calcul de soltrouve
-				if(somme==monnaieARendre) {//somme correspond 
-					
-					//calcul de meilleur
-					boolean nouvelleMeilleureSolution=false;
-					if(solution.size()<Si.size()) {//est-ce que le nombre de pièces est inférieur à celui de l'actuelle meilleure solution
-						nouvelleMeilleureSolution=true;
-					}
-					if(nouvelleMeilleureSolution) {
-						solution=Si;
-					}
-				}else {
-					//si encorepossible alors //condition d'elagage ex : (p29) la somme + le plus grand nombre de la solution candidate < monnaie à rendre
-						//solopt(i + 1) 
-					//fsi
-				}
-				
-				//calcul de défaire 
-				//...
-			}
-		}
-	
-		return solution;
-	}
-
-	//calcule l'ensemble des solutions candidates (une solution est un ensemble de pièces)
-	private static List<ArrayList<Piece>> calculerSi(List<Piece> piecesUtilisables) {
-		List<Piece> solutionEnCours = new ArrayList<Piece>();
-		List<ArrayList<Piece>> solutionsCandidates = new ArrayList<ArrayList<Piece>>();
-		
-		//calcul de combinaison de k parmi n, k varie de 1 à n
-		for(int k=1; k<=piecesUtilisables.size(); k++) {//k varie de 1 à n
-			//calcul de combinaison de k parmi n
-			for(Piece pieceEnCours : piecesUtilisables) {//pour chaque pieces
-				solutionEnCours.add(pieceEnCours);
-				for(Piece piece : piecesUtilisables) {//on essaie d'ajouter une nouvelle piece
-					if(solutionEnCours.size()<k) {
-						System.out.println(isDoublon(solutionsCandidates,solutionEnCours));//on élimine les doublons
-						solutionEnCours.add(piece);
-						//si la solution en cours n'est pas vide, on l'ajoute
-						if(!solutionEnCours.isEmpty()) {
-							solutionsCandidates.add((ArrayList<Piece>) solutionEnCours);
-							solutionEnCours=new ArrayList<Piece>();
-							if(piece!=piecesUtilisables.get(piecesUtilisables.size()-1)) {//si ce n'est pas la derniere pieces 
-								solutionEnCours.add(pieceEnCours);//on sauvegarde la piece precedente dans la solution en cours
-							}
-							
-						}
-					}
-					
-				}
-				//si la solution en cours n'est pas vide, on l'ajoute
-				if(!solutionEnCours.isEmpty()) {
-					solutionsCandidates.add((ArrayList<Piece>) solutionEnCours);
-					solutionEnCours=new ArrayList<Piece>();
-				}
-			}
-			
-			System.out.println("Listes d'éléments à "+k+" éléments :");
-			System.out.println(solutionsCandidates);
-		}
-		
-		return solutionsCandidates;
-	}
-
-	private static boolean isDoublon(List<ArrayList<Piece>> solutionsCandidates, List<Piece> solutionATeste) {
-		List<Piece> solutionATesteSave=new ArrayList<Piece>(solutionATeste);
-		
-		//attention a la taille
-		for(ArrayList<Piece> solutionEnCours : solutionsCandidates) {//pour chaques solution
-			boolean doublon=true;
-			
-			for(Piece p : solutionEnCours) {
-				if(!solutionATesteSave.contains(p)) {
-					doublon=false;
-				}else {//on retire l'element de la solution a teste
-					solutionATesteSave.remove(p);
-				}
-			}
-			
-			if(doublon) {//la solution en cours contient les memes elements que la solution a teste
-				return true;
-			}else {
-				solutionATesteSave=new ArrayList<Piece>(solutionATeste);
-			}
-			
-		}
-		
-		return false;//aucun doublon trouve
-		
-	}
 	
 }
