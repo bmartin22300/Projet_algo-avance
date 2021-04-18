@@ -1,21 +1,16 @@
 package EssaisSuccessifs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class Main {
 	
 	/*** variables utilisees pour ESSAIS SUCCESSIFS **************************************************/
-	static final double monnaieARendreES=0.01;
+	//static final double monnaieARendreES=0.01;
 	//static final double monnaieARendreES=1.87;
 	//static final double monnaieARendreES=6.33;
-	//static final double monnaieARendreES=15.15;
+	static final double monnaieARendreES=15.15;
 	
 	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
 	static int n;//taille du vecteur
@@ -32,25 +27,28 @@ public class Main {
 	
 	/*** variables utilisées pour PROGRAMMATION DYNAMIQUE **************************************************/
 	//en centimes
-	static int monnaieARendrePD = 1;
+	//static int monnaieARendrePD = 1;
 	//static int monnaieARendrePD = 187;
 	//static int monnaieARendrePD = 633;
-	//static int monnaieARendrePD = 1515;
+	static int monnaieARendrePD = 1515;
 	
 	private final static List<Integer> piecesDynamiques= new ArrayList<Integer>();
 	/*********************************************************************************************************/
 	
 	/*** variables utilisees pour GLOUTON **************************************************/
-	static final double monnaieARendreG=0.01;
+	//static final double monnaieARendreG=0.01;
 	//static final double monnaieARendreG=1.87;
 	//static final double monnaieARendreG=6.33;
-	//static final double monnaieARendreG=15.15;
+	static final double monnaieARendreG=15.15;
 	
 	private final static int OBJECTIF_DYNAMIQUE = 6000; // Nombre de centimes en entier
 	/*********************************************************************************************************/
 	
 	
 	public static void main(String[] args) {
+		
+		Chrono chrono = new Chrono();
+		double duree;
 		
 		/*** ESSAIS SUCCESSIFS ***/
 		System.out.println("ESSAIS SUCCESSIFS");
@@ -70,11 +68,14 @@ public class Main {
 		bestX=initVecteur(bestX,n);
 		
 		//appel a la fonction essais successifs
+		chrono.start(); 
 		solutionEssaisSuccessifs(0);
+		chrono.stop(); // arrêt
+		duree=chrono.getDureeMs(); // affichage du résultat en millisecondes
 		
 		//affichage de la solution
 		//afficherSolutionEssaisSuccessifs(bestX);
-		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) pour rendre "+monnaieARendreES+"€ :");
+		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) (en "+duree+"ms) pour rendre "+monnaieARendreES+"€ :");
 		afficherSES(bestX);
 		System.out.println();
 		System.out.println();
@@ -96,7 +97,7 @@ public class Main {
 		int i = piecesDynamiques.size();
 		//System.out.println(piecesDynamiques+" - " + i);
 		int j = OBJECTIF_DYNAMIQUE;
-		int[][] tab = remplirDynamiquement(i, j);
+		
 		
 		/*for (int[] x : tab)
 		{
@@ -120,33 +121,44 @@ public class Main {
 		//System.out.println(NBP(8, 501, tab));
 		//System.out.println(NBP(8, 501, tab));
 		
+		chrono.start(); 
+		int[][] tab = remplirDynamiquement(i, j);
+		List<Integer> listePD = NBP(piecesDynamiques.size(), monnaieARendrePD, tab);
+		chrono.stop(); // arrêt
+		duree=chrono.getDureeMs(); // affichage du résultat en millisecondes
+		
 		String centimes=""+monnaieARendrePD%100;
 		if(monnaieARendrePD%100<10) {
 			centimes="0"+centimes;
 		}
-		System.out.println("Meilleure solution programmation dynamique pour rendre "+monnaieARendrePD/100+"."+centimes+"€ :");
+		System.out.println("Meilleure solution programmation dynamique (en "+duree+"ms) pour rendre "+monnaieARendrePD/100+"."+centimes+"€ :");
 		
-		afficherSPD(NBP(piecesDynamiques.size(), monnaieARendrePD, tab));
+		afficherSPD(listePD);
 		System.out.println();
 		System.out.println();
 		
 		/*** FIN PROGRAMMATION DYNAMIQUE ***/
 		
 		/*** ALGORITHME GLOUTON ***/
-		List<Piece> piecesUtilisables = new ArrayList<Piece>();
+		List<Double> piecesUtilisables = new ArrayList<Double>();
 		
-		piecesUtilisables.add(new Piece(2));
-		piecesUtilisables.add(new Piece(1));
-		piecesUtilisables.add(new Piece(0.5));
-		piecesUtilisables.add(new Piece(0.2));
-		piecesUtilisables.add(new Piece(0.1));
+		piecesUtilisables.add(1.0);
+		piecesUtilisables.add(0.2);
+		piecesUtilisables.add(0.1);
+		piecesUtilisables.add(0.01);
+		piecesUtilisables.add(0.05);
+		piecesUtilisables.add(0.02);
+		piecesUtilisables.add(2.0);
+		piecesUtilisables.add(0.5);
 		
 		// Autre jeu de pieces
+		/*
 		List<Piece> autresPiecesUtilisables = new ArrayList<Piece>();
 		
 		autresPiecesUtilisables.add(new Piece(6));
 		autresPiecesUtilisables.add(new Piece(4));
 		autresPiecesUtilisables.add(new Piece(1));
+		*/
 		
 		System.out.println("ALGORITHME GLOUTON");
 		//Il faut prouver ou infirmer qu’un algorithme glouton est exact pour chaque probleme traite.
@@ -156,8 +168,15 @@ public class Main {
 		
 		// Principe pour les pieces de monnaie : 
 		
-		System.out.println("Meilleure solution glouton pour rendre "+monnaieARendreG+"€ :");
-		afficherSG(combinaisonGlouton(piecesUtilisables, monnaieARendreG));
+		chrono.start(); 
+		solutionEssaisSuccessifs(0);
+		chrono.stop(); // arrêt
+		duree=chrono.getDureeMs(); // affichage du résultat en millisecondes
+		
+		//affichage de la solution
+		List<Double> listeG=combinaisonGlouton(piecesUtilisables, monnaieARendreG);
+		System.out.println("Meilleure solution glouton (en "+duree+"ms) pour rendre "+monnaieARendreG+"€ :");
+		afficherSG(listeG);
 		/*** FIN ALGORITHME GLOUTON ***/
 		
 	}
@@ -354,18 +373,18 @@ public class Main {
 	/*** FIN PROGRAMMATION DYNAMIQUE ***/
 	
 	/*** ALGORITHME GLOUTON ***/
-	private static List<Piece> combinaisonGlouton(List<Piece> pieces, double objectif){
+	private static List<Double> combinaisonGlouton(List<Double> pieces, double objectif){
 		boolean impossible = false;
-		List<Piece> solution = new ArrayList<Piece>();
+		List<Double> solution = new ArrayList<Double>();
 		
-		while(objectif>0 && !impossible) {
+		while(objectif>0.0 && !impossible) {
 			//System.out.println(objectif);
-			Piece toAdd = findMaxValue(pieces, objectif);
+			double toAdd = findMaxValue(pieces, objectif);
 			//System.out.println(toAdd.getValeur());
-			if(toAdd != null){
+			if(toAdd != 0){
 				solution.add(toAdd);
-				objectif -= toAdd.getValeur();
-				objectif = Math.round(objectif*10.0)/10.0;
+				objectif -= toAdd;
+				objectif = Math.round(objectif*100.0)/100.0;
 				//System.out.println(objectif);
 			}
 			else {
@@ -375,11 +394,11 @@ public class Main {
 		return solution;
 	}
 	
-	private static Piece findMaxValue(List<Piece> pieces, double objectif) {
+	private static Double findMaxValue(List<Double> pieces, double objectif) {
 		double maxVal = 0; // Une valeur monetaire est forcement positive
-		Piece plusGrossePossible = null;
-		for(Piece piece : pieces) {
-			double checkVal = piece.getValeur();
+		double plusGrossePossible = 0;
+		for(double piece : pieces) {
+			double checkVal = piece;
 			if(maxVal<checkVal && checkVal<=objectif) {
 				plusGrossePossible = piece;
 				maxVal = checkVal;
@@ -389,15 +408,11 @@ public class Main {
 	}
 	
 	//affiche S pour l'algo glouton
-	private static void afficherSG(List<Piece> liste) {
-		List<Double> listeDouble=new ArrayList<>();
-		for(Piece p : liste) {
-			listeDouble.add(p.getValeur());
-		}
-		Collections.sort(listeDouble);
+	private static void afficherSG(List<Double> liste) {
+		Collections.sort(liste);
 		System.out.print("S = { ");
-		for(int i=0 ; i<listeDouble.size() ; i++) {
-			System.out.print(listeDouble.get(i)+"€ ");
+		for(int i=0 ; i<liste.size() ; i++) {
+			System.out.print(liste.get(i)+"€ ");
 		}
 		System.out.print("}");
 	}
