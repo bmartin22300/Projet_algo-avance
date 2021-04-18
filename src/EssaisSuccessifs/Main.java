@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 public class Main {
 	private final static double OBJECTIF = 1.9;
+	private final static int OBJECTIF_DYNAMIQUE = 6000; // Nombre de centimes en entier
 	
 	//variables necessaires pour essais successifs///////////////////////////////////////////////////////////
 	static final double monnaieARendre=0.1;//possibilite de modifier
@@ -27,9 +28,15 @@ public class Main {
 	static int nbAppelsEssaisSuccessifs=0;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/*** variables utilisées dans la programation dynamique **************************************************/
+	private final static List<Integer> piecesDynamiques= new ArrayList<Integer>();
+	
+	/*********************************************************************************************************/
+	
 	public static void main(String[] args) {
 		
 		//essais successifs/////////////////////////////////////////////////
+		System.out.println("ESSAIS SUCCESSIFS");
 		//initialiser les pieces utilisables
 		piecesUtilisables.add(1.0);
 		piecesUtilisables.add(0.2);
@@ -69,7 +76,50 @@ public class Main {
 		autresPiecesUtilisables.add(new Piece(4));
 		autresPiecesUtilisables.add(new Piece(1));
 		
+		/*** PROGRAMMATION DYNAMIQUE ***/
+		System.out.println("PROGRAMMATION DYNAMIQUE");
+		
+		piecesDynamiques.add(200);
+		piecesDynamiques.add(100);
+		piecesDynamiques.add(50);
+		piecesDynamiques.add(20);
+		piecesDynamiques.add(10);
+		piecesDynamiques.add(5);
+		piecesDynamiques.add(2);
+		piecesDynamiques.add(1);
+		
+		//List<Piece> algoDynamique = rechercheDynamique(piecesUtilisables, OBJECTIF);
+		int i = piecesDynamiques.size();
+		System.out.println(piecesDynamiques+" - " + i);
+		int j = OBJECTIF_DYNAMIQUE;
+		int[][] tab = remplirDynamiquement(i, j);
+		
+		/*for (int[] x : tab)
+		{
+		   for (int y : x)
+		   {
+			   if(y>0) {
+				   System.out.print("+"+y+" ");
+			   }
+			   else {
+				   System.out.print(y + " ");
+			   }
+		   }
+		   System.out.println();
+		}*/
+		
+		/*List<Integer> pieces = NBP(i, j, tab);
+		System.out.println(pieces);*/
+		System.out.println(889 + " - " + NBP(8, 889, tab));
+		System.out.println(5364 + " - " + NBP(8, 5364, tab));
+		System.out.println();
+		//System.out.println(NBP(8, 501, tab));
+		//System.out.println(NBP(8, 501, tab));
+		
+		/*** FIN PROGRAMMATION DYNAMIQUE ***/
+		
 		/*** ALGORITHME GLOUTON ***/
+		System.out.println("ALGORITHME GLOUTON");
 		//Il faut prouver ou infirmer qu’un algorithme glouton est exact pour chaque probleme traite.
 			// => Si non exact, contre exemple,
 			// => Sinon Etablir par recurrence que la solution en construction est constamment optimale
@@ -178,6 +228,73 @@ public class Main {
 		}
 	}
 	//fin essais successifs////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	/*** PROGRAMMATION DYNAMIQUE */
+
+	private static int[][] remplirDynamiquement(int i, int j) {
+		int numPiece, valeurTotal;
+		int[][] tab = new int[i][j];
+		for( valeurTotal = 1 ; valeurTotal <= j ; valeurTotal++ ) {	// On parcourt les valeurs possibles de 1 à la valeur maximale (j)
+			for( numPiece = 0 ; numPiece < i ; numPiece++ ) {		// On parcourt les pièces disponibles par inidice
+
+				if(vide(numPiece-1, valeurTotal, tab)) {			// Case au dessus non remplie
+					if(vide(numPiece, valeurTotal-piecesDynamiques.get(numPiece), tab)) { // Case du cas "on prend" non renseignée
+						if( valeurTotal-piecesDynamiques.get(numPiece)==0) { // Si la pièce correspond pile à la somme attendue
+							tab[numPiece][valeurTotal-1] = 1;
+						}
+						else {
+							tab[numPiece][valeurTotal-1] = -1;
+						}
+					}
+					else {	// On peut prendre la pièce
+						tab[numPiece][valeurTotal-1] =  1 + tab[numPiece][valeurTotal-piecesDynamiques.get(numPiece)-1]; // Tab[numPiece, valeurTotal] = 1 + Tab[numPiece, valeurTotal-C[numPiece]] # Il existe une solution si on prend
+					}
+				}
+				else {	// Case au dessus remplie
+					if(vide(numPiece, valeurTotal-piecesDynamiques.get(numPiece), tab)) { // Case du cas "on prend" non renseignée
+						tab[numPiece][valeurTotal-1]= tab[numPiece-1][valeurTotal-1]; // On assigne la valeur au dessus
+					}
+					else if( valeurTotal-piecesDynamiques.get(numPiece)==0) { // Si la pièce correspond pile à la somme attendue
+						tab[numPiece][valeurTotal-1] = 1;
+					}
+					else {	// On peut prendre la pièce, et il existe une solution avec un sous-ensemble de pièces
+						tab[numPiece][valeurTotal-1] = Math.min(tab[numPiece-1][valeurTotal-1], 1 + tab[numPiece][valeurTotal-piecesDynamiques.get(numPiece)-1]); // Tab[numPiece, valeurTotal] = Min(Tab[numPiece-1, valeurTotal],1 + Tab[numPiece, valeurTotal-C[numPiece]]) # Il existe une solution : minimum entre les 2 cases
+					}
+				}
+			}
+		}
+		return tab;
+	}
+	
+	
+	private static List<Integer> NBP(int i, int j, int[][] tab) {
+		List<Integer> pieces = new ArrayList<Integer>();
+		int num = i-1, val = j-1;
+		while(val>0 && tab[num][val]!=-1) {
+			while(num>0 && tab[num][val]==tab[num-1][val]) {
+				num-=1;
+			}
+			pieces.add(piecesDynamiques.get(num));
+			val=val-piecesDynamiques.get(num);
+		}
+		return pieces;
+	}
+
+	
+	private static boolean vide(int i, int j, int[][] tab) {
+		if(i<0 || j<1) {
+			return true;
+		}
+		else if(tab[i][j-1]==-1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/*** FIN PROGRAMMATION DYNAMIQUE ***/
 	
 	/*** ALGORITHME GLOUTON ***/
 	private static List<Piece> combinaisonGlouton(List<Piece> pieces, double objectif){
