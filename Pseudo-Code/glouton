@@ -1,0 +1,30 @@
+procédure combinaisonGlouton(tableau de réel pieces, double objectif)
+var booléen impossible <-- false;
+tableau de réel solution;
+début
+	tant que objectif > 0.0 et impossible = false) faire
+		double toAdd <-- findMaxValue(pieces, objectif);
+		si non(toAdd = 0) alors
+			solution[longueur(solution)] <--(toAdd);
+			objectif <-- objectif - toAdd;			
+		sinon 
+			impossible <-- true;
+		fsi
+	fait
+	retourner solution;
+fin
+
+procédure findMaxValue(tableau de réel pieces, double objectif)	
+var double maxVal <-- 0; 
+double plusGrossePossible <-- 0;
+double checkVal <-- 0;
+début
+	pour chaque piece dans pieces faire
+		checkVal <-- piece;
+		si maxVal<checkVal et checkVal <= objectif alors
+			plusGrossePossible <-- piece;
+			maxVal <-- checkVal;
+		fsi
+	fait
+	retourner plusGrossePossible;
+fin
