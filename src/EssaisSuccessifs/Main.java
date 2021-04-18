@@ -1,6 +1,7 @@
 package EssaisSuccessifs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
 public class Main {
 	
 	/*** variables utilisees pour ESSAIS SUCCESSIFS **************************************************/
-	static final double monnaieARendreES=1.5;//possibilite de modifier
+	static final double monnaieARendreES=1.87;//possibilite de modifier
 	
 	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
 	static int n;//taille du vecteur
@@ -43,7 +44,6 @@ public class Main {
 		
 		/*** ESSAIS SUCCESSIFS ***/
 		System.out.println("ESSAIS SUCCESSIFS");
-		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) pour rendre "+monnaieARendreES+"€ :");
 		//initialiser les pieces utilisables
 		piecesUtilisables.add(1.0);
 		piecesUtilisables.add(0.2);
@@ -64,6 +64,7 @@ public class Main {
 		
 		//affichage de la solution
 		//afficherSolutionEssaisSuccessifs(bestX);
+		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) pour rendre "+monnaieARendreES+"€ :");
 		afficherSES(bestX);
 		System.out.println();
 		System.out.println();
@@ -227,11 +228,19 @@ public class Main {
 	
 	//affiche S pour l'algo essais successifs
 	private static void afficherSES(List<Integer> bestX) {
-		System.out.print("S = { ");
+		List<Double> listDouble = new ArrayList<Double>();
+		
 		for(int i=0; i<bestX.size() ; i++) {
 			for(int j=0 ; j < bestX.get(i) ; j++) {
-				System.out.print(piecesUtilisables.get(i)+"€ ");
+				listDouble.add(piecesUtilisables.get(i));
 			}
+		}
+		
+		Collections.sort(listDouble);
+		
+		System.out.print("S = { ");
+		for(int i=0; i<listDouble.size() ; i++) {
+			System.out.print(listDouble.get(i)+"€ ");
 		}
 		System.out.print("}");
 	}
@@ -317,7 +326,12 @@ public class Main {
 	private static void afficherSPD(List<Integer> liste) {
 		System.out.print("S = { ");
 		for(int i=0; i<liste.size() ; i++) {
-			System.out.print(liste.get(i)/100+"."+liste.get(i)%100+"€ ");
+			if(liste.get(i)<10) {
+				System.out.print(liste.get(i)/100+".0"+liste.get(i)%100+"€ ");
+			}else {
+				System.out.print(liste.get(i)/100+"."+liste.get(i)%100+"€ ");
+			}
+			
 		}
 		System.out.print("}");
 	}
@@ -361,9 +375,14 @@ public class Main {
 	
 	//affiche S pour l'algo glouton
 	private static void afficherSG(List<Piece> liste) {
-		System.out.print("S = { ");
+		List<Double> listeDouble=new ArrayList<>();
 		for(Piece p : liste) {
-			System.out.print(p.getValeur()+"€ ");
+			listeDouble.add(p.getValeur());
+		}
+		Collections.sort(listeDouble);
+		System.out.print("S = { ");
+		for(int i=0 ; i<listeDouble.size() ; i++) {
+			System.out.print(listeDouble.get(i)+"€ ");
 		}
 		System.out.print("}");
 	}
