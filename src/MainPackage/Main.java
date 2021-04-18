@@ -1,4 +1,4 @@
-package EssaisSuccessifs;
+package MainPackage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,10 +6,10 @@ import java.util.List;
 public class Main {
 	
 	/*** variables utilisees pour ESSAIS SUCCESSIFS **************************************************/
-	//static final double monnaieARendreES=0.01;
-	//static final double monnaieARendreES=1.87;
+	//en euros
+	static final double monnaieARendreES=1.87;
 	//static final double monnaieARendreES=6.33;
-	static final double monnaieARendreES=15.15;
+	//static final double monnaieARendreES=15.15;
 	
 	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
 	static int n;//taille du vecteur
@@ -26,19 +26,18 @@ public class Main {
 	
 	/*** variables utilisées pour PROGRAMMATION DYNAMIQUE **************************************************/
 	//en centimes
-	//static int monnaieARendrePD = 1;
-	//static int monnaieARendrePD = 187;
+	static int monnaieARendrePD = 187;
 	//static int monnaieARendrePD = 633;
-	static int monnaieARendrePD = 1515;
+	//static int monnaieARendrePD = 1515;
 	
 	private final static List<Integer> piecesDynamiques= new ArrayList<Integer>();
 	/*********************************************************************************************************/
 	
 	/*** variables utilisees pour GLOUTON **************************************************/
-	//static final double monnaieARendreG=0.01;
-	//static final double monnaieARendreG=1.87;
+	//en euros
+	static final double monnaieARendreG=1.87;
 	//static final double monnaieARendreG=6.33;
-	static final double monnaieARendreG=15.15;
+	//static final double monnaieARendreG=15.15;
 	
 	private final static int OBJECTIF_DYNAMIQUE = 6000; // Nombre de centimes en entier
 	/*********************************************************************************************************/
@@ -177,7 +176,6 @@ public class Main {
 		System.out.println("Meilleure solution glouton (en "+duree+"ms) pour rendre "+monnaieARendreG+"€ :");
 		afficherSG(listeG);
 		/*** FIN ALGORITHME GLOUTON ***/
-		
 	}
 	
 	/*** ESSAIS SUCCESSIFS ***/
@@ -312,7 +310,7 @@ public class Main {
 						tab[numPiece][valeurTotal-1] =  1 + tab[numPiece][valeurTotal-piecesDynamiques.get(numPiece)-1]; // Tab[numPiece, valeurTotal] = 1 + Tab[numPiece, valeurTotal-C[numPiece]] # Il existe une solution si on prend
 					}
 				}
-				else {	// Case au dessus remplie
+				else {	// Case au dessus remplie	
 					if(vide(numPiece, valeurTotal-piecesDynamiques.get(numPiece), tab)) { // Case du cas "on prend" non renseignée
 						tab[numPiece][valeurTotal-1]= tab[numPiece-1][valeurTotal-1]; // On assigne la valeur au dessus
 					}

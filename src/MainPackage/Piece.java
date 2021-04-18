@@ -1,4 +1,4 @@
-package EssaisSuccessifs;
+package MainPackage;
 
 import java.util.List;
 
