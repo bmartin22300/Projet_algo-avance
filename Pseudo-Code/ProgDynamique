@@ -1,0 +1,56 @@
+variables de travail : 
+	- Pieces[] : ensemble des pièces utilisables {c1, ..., cn}
+	- valeurTotal : valeur à rendre en centimes, dans l'intervalle [1, N]
+
+
+formule de récurrence : 
+	- NBP(i, j) = MIN( NBP(i-1,j), 1+NBP(i,j-Pieces[i]))
+
+Préconditions : 
+	- n > 0
+	- N > 0
+	- Tab[n,N] est un tableau vide de dimensions n x N en entrée
+
+Postcondition :
+	- Tab[n,N] est le tableau retourné, tel que Tab[i,j] correspond au nombre minimal de pièces nécessaires 
+	pour payer la somme j en ne s'autorisant que le sous-ensemble de pièces {c1,...,ci}
+	=> Tab[i, j] = NBP(i, j)
+
+# Cette fonction permet de remplir le tableau Tab[n, N]
+fonction remplirDynamiquement(entier n, entier N, tableau vide Tab[n, N]) retourne tableau d'entiers;
+	var ent numPiece, valeurTotal;
+	var Tab[n, N] tableau d'entiers
+	début
+	    pour valeurTotal de 1 à n faire 				# de 1 à valeurMax
+	    	pour numPiece de 1 à N faire 				# de 1 à nbPiece
+		    si vide(numPiece-1, valeurTotal) faire			# Si la case au dessus n'existe pas numPiece-1<1 ou Tab[numPiece-1, valeurTotal] == -1	
+		        si vide(numPiece, valeurTotal-Pieces[numPiece], Tab) faire		# Si la case à gauche n'existe pas (la somme à rendre est inférieure à la pièce minimale) valeurTotal-C[numPiece])<0 ou Tab[?,?] == -1
+			    Tab[numPiece, valeurTotal] = -1		# Impossible de trouver une combinaison
+		        sinon si valeurTotal-Pieces[numPiece]==0 faire		# Si la pièce correspond pile à la somme attendue
+			    Tab[numPiece, valeurTotal] = 1			# Cas élémentaire : la solution optimale est un seul coup
+		        sinon 
+			    Tab[numPiece, valeurTotal] = 1 + Tab[numPiece, valeurTotal-Pieces[numPiece]] # Il existe une solution
+		    sinon 						# La case au dessus n'est pas vide
+			si vide(numPiece, valeurTotal-Pieces[numPiece]) faire	# Si la case à gauche n'existe pas (la somme à rendre est inférieure à la pièce minimale) valeurTotal-C[numPiece])<0 ou Tab[?,?] == -1
+			    Tab[numPiece, valeurTotal] = Tab[numPiece-1, valeurTotal]		# Valeur au dessus dans le tableau
+			sinon si valeurTotal-Pieces[numPiece]==0 faire		# Si la pièce correspond pile à la somme attendue
+			    Tab[numPiece, valeurTotal] = 1			# Cas élémentaire : la solution optimale est un seul coup 
+		        sinon 
+			    Tab[numPiece, valeurTotal] = Min(Tab[numPiece-1, valeurTotal],1 + Tab[numPiece, valeurTotal-Pieces[numPiece]]) # Il existe une solution : minimum entre les 2 cases
+		retourner tab
+	fin
+
+# Cette fonction permet de retrouver la liste des pièces permettant d'obtenir la valeur j 
+# à partir du sous-ensemble {c1, ci}
+fonction pieces(ent i, j, tableau d'entiers rempli Tab[][]) retourne liste d'entiers:
+	var piecesRetournées : liste d'entiers;
+	var num, val : entiers;
+	début 
+		num = i, val = j;
+		tant que val > 0 et Tab[num][val]!=-1 faire	# Tant qu'il reste des pièces à ajouter dans la solution
+			tant que num > 0 et Tab[num][val] == Tab[num-1][val] # Tant qu'il existe un sous-ensemble {c1, ..., ci-1} proposant la même solution
+				num = num - 1
+			piecesRetournées .add(Pieces[num]);
+			val = val - Pieces[num];
+		retourner piecesRetournées 
+	fin
