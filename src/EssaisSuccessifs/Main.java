@@ -12,7 +12,10 @@ import java.util.TreeMap;
 public class Main {
 	
 	/*** variables utilisees pour ESSAIS SUCCESSIFS **************************************************/
-	static final double monnaieARendreES=1.87;//possibilite de modifier
+	static final double monnaieARendreES=0.01;
+	//static final double monnaieARendreES=1.87;
+	//static final double monnaieARendreES=6.33;
+	//static final double monnaieARendreES=15.15;
 	
 	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
 	static int n;//taille du vecteur
@@ -28,13 +31,20 @@ public class Main {
 	/*********************************************************************************************************/
 	
 	/*** variables utilisées pour PROGRAMMATION DYNAMIQUE **************************************************/
-	static int monnaieARendrePD = 889;//en centimes
+	//en centimes
+	static int monnaieARendrePD = 1;
+	//static int monnaieARendrePD = 187;
+	//static int monnaieARendrePD = 633;
+	//static int monnaieARendrePD = 1515;
 	
 	private final static List<Integer> piecesDynamiques= new ArrayList<Integer>();
 	/*********************************************************************************************************/
 	
 	/*** variables utilisees pour GLOUTON **************************************************/
-	private final static double monnaieARendreG = 1.9;
+	static final double monnaieARendreG=0.01;
+	//static final double monnaieARendreG=1.87;
+	//static final double monnaieARendreG=6.33;
+	//static final double monnaieARendreG=15.15;
 	
 	private final static int OBJECTIF_DYNAMIQUE = 6000; // Nombre de centimes en entier
 	/*********************************************************************************************************/
@@ -110,7 +120,12 @@ public class Main {
 		//System.out.println(NBP(8, 501, tab));
 		//System.out.println(NBP(8, 501, tab));
 		
-		System.out.println("Meilleure solution programmation dynamique pour rendre "+monnaieARendrePD/100+"."+monnaieARendrePD%100+"€ :");
+		String centimes=""+monnaieARendrePD%100;
+		if(monnaieARendrePD%100<10) {
+			centimes="0"+centimes;
+		}
+		System.out.println("Meilleure solution programmation dynamique pour rendre "+monnaieARendrePD/100+"."+centimes+"€ :");
+		
 		afficherSPD(NBP(piecesDynamiques.size(), monnaieARendrePD, tab));
 		System.out.println();
 		System.out.println();
