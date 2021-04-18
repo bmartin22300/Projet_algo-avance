@@ -12,7 +12,7 @@ public class Main {
 	private final static double OBJECTIF = 1.9;
 	
 	//variables necessaires pour essais successifs///////////////////////////////////////////////////////////
-	static final double monnaieARendre=8.9;//possibilite de modifier
+	static final double monnaieARendre=0.1;//possibilite de modifier
 	
 	static List<Double> piecesUtilisables = new ArrayList<Double>();//vecteur des valeurs de pieces utilisables
 	static int n;//taille du vecteur
@@ -22,7 +22,9 @@ public class Main {
 	static double somcour=0.0;//somme courantes des valeurs des pieces de X
 	
 	static List<Integer> bestX = new ArrayList<Integer>();//le meilleur vecteur X (utilisant le moins de pieces)
-	static int bestNbPieces=(int) (monnaieARendre*10)+1;//on initialise au "pire cas" correspondant a (monnaieARendre*10) pieces de 0.1 
+	static int bestNbPieces=(int) (monnaieARendre*100)+1;//on initialise au "pire cas" correspondant a (monnaieARendre*100) pieces de 0.01 
+	
+	static int nbAppelsEssaisSuccessifs=0;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public static void main(String[] args) {
@@ -32,19 +34,22 @@ public class Main {
 		piecesUtilisables.add(1.0);
 		piecesUtilisables.add(0.2);
 		piecesUtilisables.add(0.1);
+		piecesUtilisables.add(0.01);
+		piecesUtilisables.add(0.05);
+		piecesUtilisables.add(0.02);
 		piecesUtilisables.add(2.0);
 		piecesUtilisables.add(0.5);
 		n=piecesUtilisables.size();
 
 		//initialisation des vecteurs X et bestX
-		X=initVecteur(X);
-		bestX=initVecteur(bestX);
+		X=initVecteur(X,n);
+		bestX=initVecteur(bestX,n);
 		
 		//appel a la fonction essais successifs
 		solutionEssaisSuccessifs(0);
 		
 		//affichage de la solution
-		System.out.println("Meilleure solution essais successifs pour rendre "+monnaieARendre+"€ :");
+		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) pour rendre "+monnaieARendre+"€ :");
 		afficherSolutionEssaisSuccessifs(bestX);
 		System.out.println();
 		////////////////////////////////////////////////////////////////////
@@ -84,6 +89,8 @@ public class Main {
 	
 	//solutionEssaisSuccessifs///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static void solutionEssaisSuccessifs(int i) {//i représente l'indice actuel du vecteur de X
+		
+		nbAppelsEssaisSuccessifs++;
 		
 		int maxXi=((int) (monnaieARendre/piecesUtilisables.get(i)))+2;//le nombre maximal de piece de cette valeur pour atteindre la monnaie
 		
@@ -128,7 +135,8 @@ public class Main {
 					}
 					
 					//encore possible ?
-					if(i<n-1 & condElagage & condElagage2 ) {
+					//if(i<n-1 & condElagage & condElagage2 ) {
+					if(i<n-1) {
 						solutionEssaisSuccessifs(i+1);//prochaine valeur de piece
 					}
 					
@@ -144,13 +152,11 @@ public class Main {
 	}
 		
 	//initialise la liste avec des valeurs egal a 0
-	private static List<Integer> initVecteur(List<Integer> X) {
+	private static List<Integer> initVecteur(List<Integer> X, int n) {
 		X.clear();
-		X.add(0);
-		X.add(0);
-		X.add(0);
-		X.add(0);
-		X.add(0);
+		for(int i=0 ; i<n ; i++) {
+			X.add(0);
+		}
 		return X;
 	}
 
