@@ -8,13 +8,19 @@ public class Main {
 	
 	
 	static List<Integer> piecesUtilisables = new ArrayList<Integer>();//vecteur des valeurs de pieces utilisables
+	
+	/** VARIABLES MODIFIABLES **/
+
+	static final int monnaieARendreES=1515;
+	static final int monnaieARendrePD = 1515;
+	static final int monnaieARendreG=1515;
+	
+	/****************************/
+	
+	
 	static int n;//taille du vecteur
 	
-	/*** variables utilisees pour ESSAIS SUCCESSIFS **************************************************/
-	//en euros
-	static final int monnaieARendreES=511;
-	//static int int monnaieARendreES=633;
-	//static int int monnaieARendreES=1515;
+	/*** variables utilisees dans ESSAIS SUCCESSIFS **************************************************/
 	
 	static List<Integer> X = new ArrayList<Integer>();//vecteur du nb de pieces utilise pour chaque valeur de piece
 	static int nbPieces=0;//somme du vecteur X
@@ -26,41 +32,31 @@ public class Main {
 	static int nbAppelsEssaisSuccessifs=0;
 	/*********************************************************************************************************/
 	
-	/*** variables utilisÃ©es pour PROGRAMMATION DYNAMIQUE **************************************************/
-	//en centimes
-	static int monnaieARendrePD = 511;
-	//static int monnaieARendrePD = 633;
-	//static int monnaieARendrePD = 1515;
+	/*** variables utilisees dans PROGRAMMATION DYNAMIQUE **************************************************/
 	
-	private final static int OBJECTIF_DYNAMIQUE = monnaieARendrePD; // Nombre de centimes en entier
+	private final static int OBJECTIF_DYNAMIQUE = monnaieARendrePD; // Taille de la structure tabulaire générée
 	/*********************************************************************************************************/
-	
-	/*** variables utilisees pour GLOUTON **************************************************/
-	//en euros
-	static final int monnaieARendreG=511;
-	//static final int monnaieARendreG=633;
-	//static final int monnaieARendreG=1515;
-	
-	/*********************************************************************************************************/
-	
+
 	
 	public static void main(String[] args) {
 		
 		Chrono chrono = new Chrono();
 		long duree;
 		
+		// Remarque :  cette composition de pièces est triée dans l'ordre inverse des autres pour respecter les conditions d'élagage
+		
+		piecesUtilisables.add(1);
+		piecesUtilisables.add(2);
+		piecesUtilisables.add(5);
+		piecesUtilisables.add(10);
+		piecesUtilisables.add(20);
+		piecesUtilisables.add(50);
+		piecesUtilisables.add(100);
+		piecesUtilisables.add(200);
+		n=piecesUtilisables.size();
+		
 		/*** ESSAIS SUCCESSIFS ***/
 		System.out.println("ESSAIS SUCCESSIFS");
-		//initialiser les pieces utilisables
-		piecesUtilisables.add(200);
-		piecesUtilisables.add(100);
-		piecesUtilisables.add(50);
-		piecesUtilisables.add(20);
-		piecesUtilisables.add(10);
-		piecesUtilisables.add(5);
-		piecesUtilisables.add(2);
-		piecesUtilisables.add(1);
-		n=piecesUtilisables.size();
 
 		//initialisation des vecteurs X et bestX
 		X=initVecteur(X,n);
@@ -74,18 +70,30 @@ public class Main {
 		
 		//affichage de la solution
 		//afficherSolutionEssaisSuccessifs(bestX);
-		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) (en "+duree+"ms) pour rendre "+monnaieARendreES+" centimes :");
+		System.out.println("Meilleure solution essais successifs (en "+nbAppelsEssaisSuccessifs+" appels) (en "+duree+"ms) pour rendre "+monnaieARendreES+" ¢ :");
 		afficherSES(bestX);
 		System.out.println();
 		System.out.println();
 		/*** FIN ESSAIS SUCCESSIFS ***/
 		
+		piecesUtilisables.clear();
+		piecesUtilisables.add(200);
+		piecesUtilisables.add(100);
+		piecesUtilisables.add(50);
+		piecesUtilisables.add(20);
+		piecesUtilisables.add(10);
+		piecesUtilisables.add(5);
+		piecesUtilisables.add(2);
+		piecesUtilisables.add(1);
+		n=piecesUtilisables.size();
+		
 		/*** PROGRAMMATION DYNAMIQUE ***/
 		System.out.println("PROGRAMMATION DYNAMIQUE");
+
 		
 		int j = OBJECTIF_DYNAMIQUE;
 		
-		
+		/** Afficher la structure tabulaire **/
 		/*for (int[] x : tab)
 		{
 		   for (int y : x)
@@ -99,14 +107,8 @@ public class Main {
 		   }
 		   System.out.println();
 		}*/
+		/****************************************/
 		
-		/*List<Integer> pieces = NBP(i, j, tab);
-		System.out.println(pieces);*/
-		//System.out.println(889 + " - " + NBP(8, 889, tab));
-		//System.out.println(5364 + " - " + NBP(8, 5364, tab));
-		//System.out.println();
-		//System.out.println(NBP(8, 501, tab));
-		//System.out.println(NBP(8, 501, tab));
 		
 		chrono.start(); 
 		int[][] tab = remplirDynamiquement(n, j);
@@ -114,7 +116,7 @@ public class Main {
 		chrono.stop(); // arrÃªt
 		duree=chrono.getDureeMs(); // affichage du rÃ©sultat en millisecondes
 		
-		System.out.println("Meilleure solution programmation dynamique (en "+duree+"ms) pour rendre "+monnaieARendrePD+ " centimes :");
+		System.out.println("Meilleure solution programmation dynamique (en "+duree+"ms) pour rendre "+monnaieARendrePD+ " ¢ :");
 		
 		afficherS(listePD);
 		System.out.println();
@@ -134,7 +136,7 @@ public class Main {
 		*/
 		
 		System.out.println("ALGORITHME GLOUTON");
-		//Il faut prouver ou infirmer quâ centimes™un algorithme glouton est exact pour chaque probleme traite.
+		//Il faut prouver ou infirmer quâ ¢™un algorithme glouton est exact pour chaque probleme traite.
 			// => Si non exact, contre exemple,
 			// => Sinon Etablir par recurrence que la solution en construction est constamment optimale
 			// => Ou partir de la solution gloutonne puis montrer que la transformation par echange de deux choix ne peut l'ameliorer
@@ -142,13 +144,13 @@ public class Main {
 		// Principe pour les pieces de monnaie : 
 		
 		chrono.start(); 
-		solutionEssaisSuccessifs(0);
+		List<Integer> listeG=combinaisonGlouton(piecesUtilisables, monnaieARendreG);
 		chrono.stop(); // arrÃªt
 		duree=chrono.getDureeMs(); // affichage du rÃ©sultat en millisecondes
 		
 		//affichage de la solution
-		List<Integer> listeG=combinaisonGlouton(piecesUtilisables, monnaieARendreG);
-		System.out.println("Meilleure solution glouton (en "+duree+"ms) pour rendre "+monnaieARendreG+" centimes :");
+		
+		System.out.println("Meilleure solution glouton (en "+duree+"ms) pour rendre "+monnaieARendreG+" ¢ :");
 		afficherS(listeG);
 		/*** FIN ALGORITHME GLOUTON ***/
 	}
@@ -228,7 +230,7 @@ public class Main {
 	//affiche la solution sous la forme de vecteur
 	private static void afficherSolutionEssaisSuccessifs(List<Integer> bestX) {
 		for(int i=0; i<bestX.size() ; i++) {
-			System.out.println(piecesUtilisables.get(i)+" centimes : "+bestX.get(i));
+			System.out.println(piecesUtilisables.get(i)+" ¢ : "+bestX.get(i));
 		}
 	}
 	
@@ -246,7 +248,7 @@ public class Main {
 		
 		System.out.print("S = { ");
 		for(int i=0; i<listint.size() ; i++) {
-			System.out.print(listint.get(i)+" centimes ");
+			System.out.print(listint.get(i)+" ¢ ");
 		}
 		System.out.print("}");
 	}
@@ -367,7 +369,7 @@ public class Main {
 		Collections.sort(liste);
 		System.out.print("S = { ");
 		for(int i=0 ; i<liste.size() ; i++) {
-			System.out.print(liste.get(i)+" centimes ");
+			System.out.print(liste.get(i)+" ¢ ");
 		}
 		System.out.print("}");
 	}
