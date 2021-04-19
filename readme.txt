@@ -8,7 +8,7 @@ Executer les algorithmes :
 - Développer Projet_algo-avance > src > MainPackage > Main
 - Ouvrir Main.java
 - Définir les valeurs de "monnaieARendre{ES,PD,G}" comme souhaité. 
-Ils correspondent respectivement à la monnaie à rendre pour les algorithmes essaisSuccessifs (ligne 10), programmation dynamique (ligne 29) et glouton (ligne 38). 
+Ils correspondent respectivement à la monnaie à rendre pour les algorithmes essaisSuccessifs, programmation dynamique et glouton et sont situés dans la partie "VARIABLES MODIFIABLES". 
 - Exécuter le fichier Main.java (clic droit > run as > java application) 
 
 Accéder aux pseudos-codes :
