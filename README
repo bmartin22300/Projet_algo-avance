@@ -1,15 +1,15 @@
 Importer le projet :
-- Télécharger un IDE qui compile et exécute et le java.
+- Télécharger un IDE qui compile et exécute le java.
 - Ouvrir l'IDE
 - File > Import > General > Existing Projects into Workspace 
 - Cocher select archive file
 - Entrer le chemin d'accès qui correspond au fichier compressé "Projet_Algo_Avance_Erwan_GARREAU_Baptiste_MARTIN.zip"
 
-Executer les algorithmes :
+Exécuter les algorithmes :
 - Développer Projet_algo-avance > src > MainPackage > Main
 - Ouvrir Main.java
-- Définir les valeurs de "monnaieARendre{ES,PD,G}" comme souhaité. 
-Ils correspondent respectivement à la monnaie à rendre pour les algorithmes essaisSuccessifs, programmation dynamique et glouton et sont situés dans la partie "VARIABLES MODIFIABLES". 
+- Définir les valeurs de "monnaieARendre{ES,PD,G}" comme souhaité (en haut du fichier). 
+Elles correspondent respectivement à la monnaie à rendre pour les algorithmes essaisSuccessifs, programmation dynamique et glouton et sont situées dans la partie "VARIABLES MODIFIABLES". 
 - Exécuter le fichier Main.java (clic droit > run as > java application) 
 
 Accéder aux pseudos-codes :
