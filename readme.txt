@@ -2,6 +2,7 @@ Importer le projet :
 - Télécharger un IDE qui compile et exécute et le java.
 - Ouvrir l'IDE
 - File > Import > General > Existing Projects into Workspace 
+- Cocher select archive file
 - Entrer le chemin d'accès qui correspond au fichier compressé "Projet_Algo_Avance_Erwan_GARREAU_Baptiste_MARTIN.zip"
 
 Executer les algorithmes :
