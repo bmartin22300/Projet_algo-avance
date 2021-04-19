@@ -10,3 +10,8 @@ Executer les algorithmes :
 - Définir les valeurs de "monnaieARendre{ES,PD,G}" comme souhaité. 
 Ils correspondent respectivement à la monnaie à rendre pour les algorithmes essaisSuccessifs (ligne 10), programmation dynamique (ligne 29) et glouton (ligne 38). 
 - Exécuter le fichier Main.java (clic droit > run as > java application) 
+
+Accéder aux pseudos-codes :
+- Ouvrir le dossier "Pseudo-code"
+- Clic simple sur l'algorithme que vous souhaitez regarder
+- Clic gauche > ouvrir avec > bloc note
